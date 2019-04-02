@@ -23,7 +23,7 @@ document.getElementById('sort-by').addEventListener('change', startSort)
 function startSort(e) {
     const sortBy = e.target.value
     state.sortBy = sortBy
-    sortArticles()
+    updateArticles()
 }
 
 document.getElementById('filter-length').addEventListener('change', changeLengthFilter)
@@ -48,6 +48,7 @@ function updateArticles(articles) {
 
     //update articles in state
     state = {...state, articles}
+    sortArticles()
 
     const searchResults = document.getElementById('search-results');
     //better performance than searchResults.innerHTML = ''
@@ -56,8 +57,6 @@ function updateArticles(articles) {
     }
 
     const filteredArticles = filterByDate(filterByLength(articles))
-
-    console.log(filteredArticles)
 
     filteredArticles.forEach(article=> addArticle(article))
 }
@@ -162,7 +161,7 @@ function sortArticles() {
         return reverse ? comparison * -1 : comparison
     })
 
-    updateArticles(sortedArticles)
+    state.articles = sortedArticles
 
 }
 
