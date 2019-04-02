@@ -2,97 +2,101 @@ const initialState = {
     articles: [],
     sortBy: 'default',
     lengthFilter: 'any',
-    dateFilter: 'any'
+    dateFilter: 'any',
+    searchTerm: 'JavaScript'
 }
 
-let state = {...initialState}
+let state = {...initialState};
 
 
 //Event listeners and handlers
-document.getElementById('search-form').addEventListener('submit', startSearch)
+document.getElementById('search-form').addEventListener('submit', startSearch);
 
 function startSearch(e){
-    e.preventDefault()
-    updateArticles([])
-    const searchTerm = document.getElementById('search-input').value
-    findArticles(searchTerm)
-}
+    e.preventDefault();
+    updateArticles([]);
+    const searchTerm = document.getElementById('search-input').value;
+    const regex = new RegExp ('&', 'gi')
+    newSearchTerm = searchTerm.replace(regex, ' and ')
+    state.searchTerm = newSearchTerm
+    findArticles(newSearchTerm);
+};
 
-document.getElementById('sort-by').addEventListener('change', startSort)
+document.getElementById('sort-by').addEventListener('change', startSort);
 
 function startSort(e) {
-    const sortBy = e.target.value
-    state.sortBy = sortBy
-    updateArticles(state.articles)
-}
+    const sortBy = e.target.value;
+    state.sortBy = sortBy;
+    updateArticles(state.articles);
+};
 
-document.getElementById('filter-length').addEventListener('change', changeLengthFilter)
+document.getElementById('filter-length').addEventListener('change', changeLengthFilter);
 
 function changeLengthFilter(e) {
-    state.lengthFilter = e.target.value
-    updateArticles(state.articles)
-}
+    state.lengthFilter = e.target.value;
+    updateArticles(state.articles);
+};
 
-document.getElementById('filter-date').addEventListener('change', changeDateFilter)
+document.getElementById('filter-date').addEventListener('change', changeDateFilter);
 
 function changeDateFilter(e) {
-    state.dateFilter = e.target.value
-    updateArticles(state.articles)
-}
+    state.dateFilter = e.target.value;
+    updateArticles(state.articles);
+};
 
 
 
 function updateArticles(articles) {
     removeLoadingIcon()
 
-    const sortedArticles = sortArticles(articles)
+    const sortedArticles = sortArticles(articles);
     //update articles in state
-    state = {...state, articles: sortedArticles}
+    state = {...state, articles: sortedArticles};
     const searchResults = document.getElementById('search-results');
     //better performance than searchResults.innerHTML = ''
     while(searchResults.firstChild) {
         searchResults.removeChild(searchResults.firstChild);
     }
 
-    const filteredArticles = filterByDate(filterByLength(sortedArticles))
+    const filteredArticles = filterByDate(filterByLength(sortedArticles));
 
-    filteredArticles.forEach(article=> addArticle(article))
+    filteredArticles.forEach(article=> addArticle(article));
 }
 
 function addArticle({title, description, timestamp, url}) {
     //create the heading
-    const headingLink = document.createElement('a')
-    headingLink.href = url
-    headingLink.target = '_blank'
-    const headingText = document.createTextNode(title)
+    const headingLink = document.createElement('a');
+    headingLink.href = url;
+    headingLink.target = '_blank';
+    const headingText = document.createTextNode(title);
     headingLink.appendChild(headingText);
-    headingLink.className = 'article__heading-link'
+    headingLink.className = 'article__heading-link';
 
-    const heading = document.createElement('h3')
+    const heading = document.createElement('h3');
     heading.appendChild(headingLink);
-    heading.className = 'article__heading'
+    heading.className = 'article__heading';
 
     //create the description
-    const body = document.createElement('p')
-    const bodyText = document.createTextNode(description)
-    body.appendChild(bodyText)
-    body.className = 'article__body'
+    const body = document.createElement('p');
+    const bodyInnerHTML = highlightSearchTerms(state.searchTerm, description);
+    body.innerHTML = bodyInnerHTML;
+    body.className = 'article__body';
 
     //create the last revised footer
-    const footer = document.createElement('p')
-    const formattedDate = getFormattedDate(timestamp)
-    const revisedText = document.createTextNode('Last revised on ' + formattedDate)
-    footer.appendChild(revisedText)
-    footer.className = 'article__footer'
+    const footer = document.createElement('p');
+    const formattedDate = getFormattedDate(timestamp);
+    const revisedText = document.createTextNode('Last revised on ' + formattedDate);
+    footer.appendChild(revisedText);
+    footer.className = 'article__footer';
 
-    const article = document.createElement('article')
-    article.appendChild(heading)
-    article.appendChild(body)
-    article.appendChild(footer)
-    article.className='article'
+    const article = document.createElement('article');
+    article.appendChild(heading);
+    article.appendChild(body);
+    article.appendChild(footer);
+    article.className='article';
     
-    const searchResults = document.getElementById('search-results')
-    searchResults.appendChild(article)
+    const searchResults = document.getElementById('search-results');
+    searchResults.appendChild(article);
 }
 
 function getFormattedDate(isoDate) {
@@ -109,21 +113,21 @@ function getFormattedDate(isoDate) {
         'October',
         'November',
         'December'
-    ]
+    ];
 
-    const year = isoDate.slice(0,4)
-    const month = months[Number(isoDate.slice(5,7))-1]
-    const day = isoDate.slice(8,10)
+    const year = isoDate.slice(0,4);
+    const month = months[Number(isoDate.slice(5,7))-1];
+    const day = isoDate.slice(8,10);
 
     return `${month} ${day}, ${year}`
-}
+};
 
 
 //Filter and sort functions
 
 function sortArticles(articles) {
-    const {sortBy} = state
-    const options = {sortByProperty: '', reverse: false}
+    const {sortBy} = state;
+    const options = {sortByProperty: '', reverse: false};
     
     switch(sortBy) {
         case 'default':
@@ -144,67 +148,67 @@ function sortArticles(articles) {
             options.sortByProperty = 'lastRevisionTime';
             break;
         default: 
-            console.error(`${sortBy} is not a sort by option.`)
+            console.error(`${sortBy} is not a sort by option.`);
     }
 
     const sortedArticles = articles.sort((article, nextArticle) => {
-        const { sortByProperty, reverse } = options
+        const { sortByProperty, reverse } = options;
         let comparison = 0;
         if(article[sortByProperty] > nextArticle[sortByProperty]){
-            comparison = 1
+            comparison = 1;
         }  else if (article[sortByProperty] < nextArticle[sortByProperty]) {
-            comparison = -1
+            comparison = -1;
         }
 
-        return reverse ? comparison * -1 : comparison
-    })
+        return reverse ? comparison * -1 : comparison;
+    });
 
-    return sortedArticles
+    return sortedArticles;
 
 }
 
 function filterByLength(articles) {
-    const filter = state.lengthFilter
+    const filter = state.lengthFilter;
     
     function isSelectedLength(wordcount) {
-        if(filter === 'any') return true
-        if(filter === 'short') return wordcount < 2000
-        if(filter === 'medium') return wordcount >= 2000 && wordcount < 6000
-        if(filter === 'long') return wordcount >= 6000
-        console.error(filter + ' is not a length filter option.')
+        if(filter === 'any') return true;
+        if(filter === 'short') return wordcount < 2000;
+        if(filter === 'medium') return wordcount >= 2000 && wordcount < 6000;
+        if(filter === 'long') return wordcount >= 6000;
+        console.error(filter + ' is not a length filter option.');
         return false
     }
 
-    return articles.filter(article => isSelectedLength(article.wordcount))
+    return articles.filter(article => isSelectedLength(article.wordcount));
 }
 
 function filterByDate(articles) {
-    const filter = state.dateFilter
+    const filter = state.dateFilter;
     
     function isSufficientlyRecent(revisionTime) {
         function oneWeekAgo() {
-            const date = new Date()
-            date.setDate(date.getDate() - 7)
-            return date.getTime()            
+            const date = new Date();
+            date.setDate(date.getDate() - 7);
+            return date.getTime();           
         }
         function oneMonthAgo() {
-            const date = new Date()
-            date.setMonth(date.getMonth() - 1)
-            return date.getTime()            
+            const date = new Date();
+            date.setMonth(date.getMonth() - 1);
+            return date.getTime();           
         }
         function oneYearAgo() {
-            const date = new Date()
-            date.setYear(date.getYear() - 1)
-            return date.getTime()            
+            const date = new Date();
+            date.setYear(date.getYear() - 1);
+            return date.getTime();          
         }
         if(filter === 'any') return true
-        if(filter === 'week') return revisionTime > oneWeekAgo()
-        if(filter === 'month') return revisionTime > oneMonthAgo()
-        if(filter === 'year') return revisionTime > oneYearAgo()
-        console.error(filter + ' is not a date filter option.')
+        if(filter === 'week') return revisionTime > oneWeekAgo();
+        if(filter === 'month') return revisionTime > oneMonthAgo();
+        if(filter === 'year') return revisionTime > oneYearAgo();
+        console.error(filter + ' is not a date filter option.');
         return false
     }
-    return articles.filter(article => isSufficientlyRecent(article.lastRevisionTime))
+    return articles.filter(article => isSufficientlyRecent(article.lastRevisionTime));
 }
 
 
@@ -213,9 +217,9 @@ function filterByDate(articles) {
 function findArticles (searchTerm) {
     addLoadingIcon()
     const xhr = new XMLHttpRequest();
-    const apiUrl = 'https://en.wikipedia.org/w/api.php?'
-    const options = `action=query&list=search&srsearch=${searchTerm}&utf8=&format=json&origin=*`
-    const urlToFetch = apiUrl + options
+    const apiUrl = 'https://en.wikipedia.org/w/api.php?';
+    const options = `action=query&list=search&srsearch=${searchTerm}&utf8=&format=json&origin=*`;
+    const urlToFetch = apiUrl + options;
 
     xhr.open('GET', urlToFetch);
     
@@ -229,12 +233,12 @@ function findArticles (searchTerm) {
       const response = JSON.parse(xhr.response)
       const articles = response.query.search
       addDescriptionsAndUrls(articles)
-    };
+    }
     
     
     xhr.onerror = function() {
         console.error('Network error')
-    };
+    }
 
 
 }
@@ -287,4 +291,21 @@ function removeLoadingIcon() {
     if(loadingIcon) loadingIcon.remove()
 }
 
-findArticles('javascript')
+function highlightSearchTerms(searchTerm, extract) {
+    const searchTermArr = searchTerm.split(' ')
+    searchTermArr.forEach(term => {
+        term.trim();
+        //do not search for empty strings
+        if(!term)return;
+        const regex = new RegExp(`\\b${term}\\b`, 'gi');
+        //use callback function in regex replace to keep capitalization of original word
+        extract = extract.replace(regex, (match) => ` <span class='highlighted'>${match}</span> `);
+        if(term === 'and') {
+            const andRegex = new RegExp (' & ', 'g')
+            extract = extract.replace(andRegex, ` <span class='highlighted'>${'&'}</span> `);
+        }
+    })
+    return extract;
+}
+
+findArticles('javascript');

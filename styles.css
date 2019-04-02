@@ -61,6 +61,10 @@ h1 {
     margin-block-end: 0.5em;
 }
 
+.highlighted {
+    background-color: yellow;
+}
+
 .article__footer {
     margin-block-start: 0.5em;
     font-style: italic;
