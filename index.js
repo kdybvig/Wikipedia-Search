@@ -23,7 +23,7 @@ document.getElementById('sort-by').addEventListener('change', startSort)
 function startSort(e) {
     const sortBy = e.target.value
     state.sortBy = sortBy
-    updateArticles()
+    updateArticles(state.articles)
 }
 
 document.getElementById('filter-length').addEventListener('change', changeLengthFilter)
@@ -43,20 +43,18 @@ function changeDateFilter(e) {
 
 
 function updateArticles(articles) {
-
     removeLoadingIcon()
 
+    const sortedArticles = sortArticles(articles)
     //update articles in state
-    state = {...state, articles}
-    sortArticles()
-
+    state = {...state, articles: sortedArticles}
     const searchResults = document.getElementById('search-results');
     //better performance than searchResults.innerHTML = ''
     while(searchResults.firstChild) {
         searchResults.removeChild(searchResults.firstChild);
     }
 
-    const filteredArticles = filterByDate(filterByLength(articles))
+    const filteredArticles = filterByDate(filterByLength(sortedArticles))
 
     filteredArticles.forEach(article=> addArticle(article))
 }
@@ -123,10 +121,10 @@ function getFormattedDate(isoDate) {
 
 //Filter and sort functions
 
-function sortArticles() {
+function sortArticles(articles) {
     const {sortBy} = state
     const options = {sortByProperty: '', reverse: false}
-
+    
     switch(sortBy) {
         case 'default':
             options.sortByProperty = 'relevance';
@@ -149,7 +147,7 @@ function sortArticles() {
             console.error(`${sortBy} is not a sort by option.`)
     }
 
-    const sortedArticles = [...state.articles].sort((article, nextArticle) => {
+    const sortedArticles = articles.sort((article, nextArticle) => {
         const { sortByProperty, reverse } = options
         let comparison = 0;
         if(article[sortByProperty] > nextArticle[sortByProperty]){
@@ -161,20 +159,19 @@ function sortArticles() {
         return reverse ? comparison * -1 : comparison
     })
 
-    state.articles = sortedArticles
+    return sortedArticles
 
 }
 
 function filterByLength(articles) {
     const filter = state.lengthFilter
-    console.log(filter)
     
     function isSelectedLength(wordcount) {
         if(filter === 'any') return true
         if(filter === 'short') return wordcount < 2000
         if(filter === 'medium') return wordcount >= 2000 && wordcount < 6000
         if(filter === 'long') return wordcount >= 6000
-        console.log(filter + ' is not a length filter option.')
+        console.error(filter + ' is not a length filter option.')
         return false
     }
 
@@ -204,7 +201,7 @@ function filterByDate(articles) {
         if(filter === 'week') return revisionTime > oneWeekAgo()
         if(filter === 'month') return revisionTime > oneMonthAgo()
         if(filter === 'year') return revisionTime > oneYearAgo()
-        console.log(filter + ' is not a date filter option.')
+        console.error(filter + ' is not a date filter option.')
         return false
     }
     return articles.filter(article => isSufficientlyRecent(article.lastRevisionTime))
@@ -226,12 +223,11 @@ function findArticles (searchTerm) {
     
     xhr.onload = function() {
       if (xhr.status != 200) {
-        console.log(`${xhr.status}: ${xhr.statusText}`);
+        console.error(`${xhr.status}: ${xhr.statusText}`);
         return;
       }
       const response = JSON.parse(xhr.response)
       const articles = response.query.search
-      console.log('articles', articles)
       addDescriptionsAndUrls(articles)
     };
     
@@ -269,14 +265,13 @@ function  addDescriptionsAndUrls(articles) {
             const lastRevisionTime = lastRevision.getTime()
             return {...article, description: descriptions[index], url: urls[index], relevance: index, lastRevisionTime}
         })
-        console.log('articles with descriptions', enhancedArticles)
         updateArticles(enhancedArticles)
         return
     };
     
     
     xhr.onerror = function() {
-      console.log('network error')
+      console.error('network error')
     };
 }
 
