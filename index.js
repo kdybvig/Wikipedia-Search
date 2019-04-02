@@ -1,3 +1,64 @@
+const initialState = {
+    articles: [],
+    sortBy: 'default',
+    lengthFilter: 'any',
+    dateFilter: 'any'
+}
+
+let state = {...initialState}
+
+
+//Event listeners and handlers
+document.getElementById('search-form').addEventListener('submit', startSearch)
+
+function startSearch(e){
+    e.preventDefault()
+    const searchTerm = document.getElementById('search-input').value
+    findArticles(searchTerm)
+}
+
+document.getElementById('sort-by').addEventListener('change', startSort)
+
+function startSort(e) {
+    const sortBy = e.target.value
+    state.sortBy = sortBy
+    sortArticles()
+}
+
+document.getElementById('filter-length').addEventListener('change', changeLengthFilter)
+
+function changeLengthFilter(e) {
+    state.lengthFilter = e.target.value
+    updateArticles(state.articles)
+}
+
+document.getElementById('filter-date').addEventListener('change', changeDateFilter)
+
+function changeDateFilter(e) {
+    state.dateFilter = e.target.value
+    updateArticles(state.articles)
+}
+
+
+
+function updateArticles(articles) {
+
+    //update articles in state
+    state = {...state, articles}
+
+    const searchResults = document.getElementById('search-results');
+    //better performance than searchResults.innerHTML = ''
+    while(searchResults.firstChild) {
+        searchResults.removeChild(searchResults.firstChild);
+    }
+
+    const filteredArticles = filterByDate(filterByLength(articles))
+
+    console.log(filteredArticles)
+
+    filteredArticles.forEach(article=> addArticle(article))
+}
+
 function addArticle({title, description, timestamp}) {
     //create the heading
     const heading = document.createElement('h3')
@@ -47,15 +108,98 @@ function getFormattedDate(isoDate) {
     return `${month} ${day}, ${year}`
 }
 
-// addArticle({
-//     ns: 0,
-//     title: 'Pizza',
-//     pageid: 24768,
-//     size: 50084,
-//     wordcount: 5055,
-//     snippet: "<span class='searchmatch'>pizza</span> chains List of <span class='searchmatch'>pizza</span> varieties by country Matzah <span class='searchmatch'>pizza</span> Italian cuisine <span class='searchmatch'>Pizza</span> cake <span class='searchmatch'>Pizza</span> cheese <span class='searchmatch'>Pizza</span> in China <span class='searchmatch'>Pizza</span> delivery <span class='searchmatch'>Pizza</span> farm <span class='searchmatch'>Pizza</span> saver",
-//     timestamp: '2019-03-08T18:21:44Z'
-// })
+
+//Filter and sort functions
+
+function sortArticles() {
+    const {sortBy} = state
+    const options = {sortByProperty: '', reverse: false}
+
+    switch(sortBy) {
+        case 'default':
+            options.sortByProperty = 'relevance';
+            break;
+        case 'alpha':
+            options.sortByProperty = 'title';
+            break;
+        case 'reverse-alpha':
+            options.sortByProperty = 'title';
+            options.reverse = true;
+            break;
+        case 'recent':
+            options.sortByProperty = 'lastRevisionTime';
+            break;
+        case 'reverse-recent':
+            options.sortByProperty = 'lastRevisionTime';
+            options.reverse = true;
+            break;
+        default: 
+            console.error(`${sortBy} is not a sort by option.`)
+    }
+
+    const sortedArticles = [...state.articles].sort((article, nextArticle) => {
+        const { sortByProperty, reverse } = options
+        let comparison = 0;
+        if(article[sortByProperty] > nextArticle[sortByProperty]){
+            comparison = 1
+        }  else if (article[sortByProperty] < nextArticle[sortByProperty]) {
+            comparison = -1
+        }
+
+        return reverse ? comparison * -1 : comparison
+    })
+
+    updateArticles(sortedArticles)
+
+}
+
+function filterByLength(articles) {
+    const filter = state.lengthFilter
+    console.log(filter)
+    
+    function isSelectedLength(wordcount) {
+        if(filter === 'any') return true
+        if(filter === 'short') return wordcount < 2000
+        if(filter === 'medium') return wordcount >= 2000 && wordcount < 6000
+        if(filter === 'long') return wordcount >= 6000
+        console.log(filter + ' is not a length filter option.')
+        return false
+    }
+
+    return articles.filter(article => isSelectedLength(article.wordcount))
+}
+
+function filterByDate(articles) {
+    const filter = state.dateFilter
+    
+    function isSufficientlyRecent(revisionTime) {
+        function oneWeekAgo() {
+            const date = new Date()
+            date.setDate(date.getDate() - 7)
+            return date.getTime()            
+        }
+        function oneMonthAgo() {
+            const date = new Date()
+            date.setMonth(date.getMonth() - 1)
+            return date.getTime()            
+        }
+        function oneYearAgo() {
+            const date = new Date()
+            date.setYear(date.getYear() - 1)
+            return date.getTime()            
+        }
+        if(filter === 'any') return true
+        if(filter === 'week') return revisionTime > oneWeekAgo()
+        if(filter === 'month') return revisionTime > oneMonthAgo()
+        if(filter === 'year') return revisionTime > oneYearAgo()
+        console.log(filter + ' is not a date filter option.')
+        return false
+    }
+    return articles.filter(article => isSufficientlyRecent(article.lastRevisionTime))
+}
+
+
+//API calls
 
 function findArticles (searchTerm) {
     const xhr = new XMLHttpRequest();
@@ -74,16 +218,19 @@ function findArticles (searchTerm) {
       }
       const response = JSON.parse(xhr.response)
       const articles = response.query.search
+      console.log('articles', articles)
       addDescriptions(articles)
     };
     
     
     xhr.onerror = function() {
-      console.log('network error')
+      console.error('Network error')
     };
 
 
 }
+
+
 
 function  addDescriptions(articles) {
     const pageIds = articles.map(article => article.pageid)
@@ -99,19 +246,20 @@ function  addDescriptions(articles) {
     
     xhr.onload = function() {
         if (xhr.status != 200) {
-            console.log(`${xhr.status}: ${xhr.statusText}`);
+            console.error(`${xhr.status}: ${xhr.statusText}`);
             return;
         }
         const response = JSON.parse(xhr.response)
-        console.log(response);
         const descriptions = pageIds.map(pageId => {
             return response.query.pages[pageId].extract
         })
         const articlesWithDescriptions = articles.map((article, index) => {
-            return {...article, description: descriptions[index]}
+            const lastRevision = new Date (article.timestamp)
+            const lastRevisionTime = lastRevision.getTime()
+            return {...article, description: descriptions[index], relevance: index, lastRevisionTime}
         })
         console.log('articles with descriptions', articlesWithDescriptions)
-        articlesWithDescriptions.forEach(article => addArticle(article))
+        updateArticles(articlesWithDescriptions)
         return
     };
     
@@ -121,4 +269,4 @@ function  addDescriptions(articles) {
     };
 }
 
-  findArticles('pizza')
+findArticles('javascript')

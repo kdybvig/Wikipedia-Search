@@ -13,8 +13,8 @@
     </header>
     <main>
         <h1>Wikipedia Search</h1>
-        <form>
-            <input />
+        <form id="search-form">
+            <input id="search-input" />
             <button type="submit">Search</button>
         </form>
         <div id='filters-and-sorting'>
@@ -27,15 +27,15 @@
                 <option value="reverse-recent">Last Revision (Most Recent Last)</option>
             </select>
             <label for="filter-length">Article Length</label>
-            <select id="filter-length" value="default">
-                <option value="default">Any</option>
+            <select id="filter-length" value="any">
+                <option value="any">Any</option>
                 <option value="short">Short (0 - 1999 words)</option>
                 <option value="medium">Medium (2000-5999 words)</option>
                 <option value="long">Long (6000+ words)</option>
             </select>
             <label for="filter-date">Last Revision Date</label>
-            <select id="filter-date" value="default">
-                <option value="default">Any</option>
+            <select id="filter-date" value="any">
+                <option value="any">Any</option>
                 <option value="week">Past Week</option>
                 <option value="month">Past Month</option>
                 <option value="year">Past Year</option>
