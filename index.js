@@ -115,7 +115,7 @@ function getFormattedDate(isoDate) {
     ]
 
     const year = isoDate.slice(0,4)
-    const month = months[Number(isoDate.slice(5,7))]
+    const month = months[Number(isoDate.slice(5,7))-1]
     const day = isoDate.slice(8,10)
 
     return `${month} ${day}, ${year}`
