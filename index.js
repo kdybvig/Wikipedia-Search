@@ -44,6 +44,8 @@ function changeDateFilter(e) {
 
 function updateArticles(articles) {
 
+    removeLoadingIcon()
+
     //update articles in state
     state = {...state, articles}
 
@@ -60,27 +62,37 @@ function updateArticles(articles) {
     filteredArticles.forEach(article=> addArticle(article))
 }
 
-function addArticle({title, description, timestamp}) {
+function addArticle({title, description, timestamp, url}) {
     //create the heading
-    const heading = document.createElement('h3')
+    const headingLink = document.createElement('a')
+    headingLink.href = url
+    headingLink.target = '_blank'
     const headingText = document.createTextNode(title)
-    heading.appendChild(headingText);
+    headingLink.appendChild(headingText);
+    headingLink.className = 'article__heading-link'
+
+    const heading = document.createElement('h3')
+    heading.appendChild(headingLink);
+    heading.className = 'article__heading'
 
     //create the description
     const body = document.createElement('p')
-    body.innerHTML = description
+    const bodyText = document.createTextNode(description)
+    body.appendChild(bodyText)
+    body.className = 'article__body'
 
     //create the last revised footer
     const footer = document.createElement('p')
-    footer.className = 'footer'
     const formattedDate = getFormattedDate(timestamp)
     const revisedText = document.createTextNode('Last revised on ' + formattedDate)
     footer.appendChild(revisedText)
+    footer.className = 'article__footer'
 
     const article = document.createElement('article')
     article.appendChild(heading)
     article.appendChild(body)
     article.appendChild(footer)
+    article.className='article'
     
     const searchResults = document.getElementById('search-results')
     searchResults.appendChild(article)
@@ -216,30 +228,28 @@ function findArticles (searchTerm) {
     xhr.onload = function() {
       if (xhr.status != 200) {
         console.log(`${xhr.status}: ${xhr.statusText}`);
-        removeLoadingIcon()
         return;
       }
       const response = JSON.parse(xhr.response)
       const articles = response.query.search
       console.log('articles', articles)
-      addDescriptions(articles)
+      addDescriptionsAndUrls(articles)
     };
     
     
     xhr.onerror = function() {
-        removeLoadingIcon()
         console.error('Network error')
     };
 
 
 }
 
-function  addDescriptions(articles) {
+function  addDescriptionsAndUrls(articles) {
     const pageIds = articles.map(article => article.pageid)
     const pageIdsStr = pageIds.join('|')
     const xhr = new XMLHttpRequest();
     const apiUrl = 'https://en.wikipedia.org/w/api.php?'
-    const options = `action=query&pageids=${pageIdsStr}&prop=extracts&exintro=true&explaintext=true&exsentences=3&format=json&origin=*`
+    const options = `action=query&pageids=${pageIdsStr}&prop=extracts|info&inprop=url&exintro=true&explaintext=true&exsentences=3&format=json&origin=*`
     const urlToFetch = apiUrl + options
 
     xhr.open('GET', urlToFetch);
@@ -249,28 +259,25 @@ function  addDescriptions(articles) {
     xhr.onload = function() {
         if (xhr.status != 200) {
             console.error(`${xhr.status}: ${xhr.statusText}`);
-            removeLoadingIcon()
             return;
         }
         const response = JSON.parse(xhr.response)
-        const descriptions = pageIds.map(pageId => {
-            return response.query.pages[pageId].extract
-        })
-        const articlesWithDescriptions = articles.map((article, index) => {
+        const descriptions = pageIds.map(pageId => response.query.pages[pageId].extract)
+        const urls = pageIds.map(pageId => response.query.pages[pageId].fullurl)
+
+        const enhancedArticles = articles.map((article, index) => {
             const lastRevision = new Date (article.timestamp)
             const lastRevisionTime = lastRevision.getTime()
-            return {...article, description: descriptions[index], relevance: index, lastRevisionTime}
+            return {...article, description: descriptions[index], url: urls[index], relevance: index, lastRevisionTime}
         })
-        console.log('articles with descriptions', articlesWithDescriptions)
-        updateArticles(articlesWithDescriptions)
-        removeLoadingIcon()
+        console.log('articles with descriptions', enhancedArticles)
+        updateArticles(enhancedArticles)
         return
     };
     
     
     xhr.onerror = function() {
       console.log('network error')
-      removeLoadingIcon()
     };
 }
 
@@ -282,7 +289,8 @@ function addLoadingIcon() {
 }
 
 function removeLoadingIcon() {
-    document.getElementById('loading-gif').remove()
+    const loadingIcon = document.getElementById('loading-gif')
+    if(loadingIcon) loadingIcon.remove()
 }
 
 findArticles('javascript')

@@ -8,39 +8,45 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h5>Wikipedia Search</h5>
+    <header class="header">
+        <h5 id='header__title'>Wikipedia Search Application</h5>
     </header>
     <main>
         <h1>Wikipedia Search</h1>
         <form id="search-form">
-            <input id="search-input" />
-            <button type="submit">Search</button>
+            <input id="search-input" value="JavaScript"/>
+            <button class="btn" type="submit">Search</button>
         </form>
-        <div id='filters-and-sorting'>
-            <label for="sort-by">Sort by:</label>
-            <select id="sort-by" value="default">
-                <option value="default">Relevance and Popularity</option>
-                <option value="alpha">Alphabetical (A-Z)</option>
-                <option value="reverse-alpha">Reverse Alphabetical (Z-A)</option>
-                <option value="recent">Last Revision (Most Recent First)</option>
-                <option value="reverse-recent">Last Revision (Most Recent Last)</option>
-            </select>
-            <label for="filter-length">Article Length</label>
-            <select id="filter-length" value="any">
-                <option value="any">Any</option>
-                <option value="short">Short (0 - 1999 words)</option>
-                <option value="medium">Medium (2000-5999 words)</option>
-                <option value="long">Long (6000+ words)</option>
-            </select>
-            <label for="filter-date">Last Revision Date</label>
-            <select id="filter-date" value="any">
-                <option value="any">Any</option>
-                <option value="week">Past Week</option>
-                <option value="month">Past Month</option>
-                <option value="year">Past Year</option>
-            </select>
-        </div>
+        <form class="search-options">
+            <div class='search-options__group'>
+                <label class='search-options__label' for="sort-by">Sort by:</label>
+                <select class='search-options__select' id="sort-by" value="default">
+                    <option value="default">Relevance and Popularity</option>
+                    <option value="alpha">Alphabetical (A-Z)</option>
+                    <option value="reverse-alpha">Reverse Alphabetical (Z-A)</option>
+                    <option value="recent">Last Revision (Most Recent First)</option>
+                    <option value="reverse-recent">Last Revision (Most Recent Last)</option>
+                </select>
+            </div>
+            <div class='search-options__group'>
+                <label class='search-options__label' for="filter-length">Article Length</label>
+                <select class='search-options__select' id="filter-length" value="any">
+                    <option value="any">Any</option>
+                    <option value="short">Short (0 - 1999 words)</option>
+                    <option value="medium">Medium (2000-5999 words)</option>
+                    <option value="long">Long (6000+ words)</option>
+                </select>
+            </div>
+            <div class='search-options__group'>
+                <label class='search-options__label' for="filter-date">Last Revision Date</label>
+                <select id="filter-date" value="any">
+                    <option value="any">Any</option>
+                    <option value="week">Past Week</option>
+                    <option value="month">Past Month</option>
+                    <option value="year">Past Year</option>
+                </select>
+            </div>
+        </form>
         <div id="search-results">
 
         </div>
