@@ -13,6 +13,7 @@ document.getElementById('search-form').addEventListener('submit', startSearch)
 
 function startSearch(e){
     e.preventDefault()
+    updateArticles([])
     const searchTerm = document.getElementById('search-input').value
     findArticles(searchTerm)
 }
@@ -128,10 +129,10 @@ function sortArticles() {
             break;
         case 'recent':
             options.sortByProperty = 'lastRevisionTime';
+            options.reverse = true; //sort from greatest (most recent) to least
             break;
         case 'reverse-recent':
             options.sortByProperty = 'lastRevisionTime';
-            options.reverse = true;
             break;
         default: 
             console.error(`${sortBy} is not a sort by option.`)
@@ -202,6 +203,7 @@ function filterByDate(articles) {
 //API calls
 
 function findArticles (searchTerm) {
+    addLoadingIcon()
     const xhr = new XMLHttpRequest();
     const apiUrl = 'https://en.wikipedia.org/w/api.php?'
     const options = `action=query&list=search&srsearch=${searchTerm}&utf8=&format=json&origin=*`
@@ -214,6 +216,7 @@ function findArticles (searchTerm) {
     xhr.onload = function() {
       if (xhr.status != 200) {
         console.log(`${xhr.status}: ${xhr.statusText}`);
+        removeLoadingIcon()
         return;
       }
       const response = JSON.parse(xhr.response)
@@ -224,13 +227,12 @@ function findArticles (searchTerm) {
     
     
     xhr.onerror = function() {
-      console.error('Network error')
+        removeLoadingIcon()
+        console.error('Network error')
     };
 
 
 }
-
-
 
 function  addDescriptions(articles) {
     const pageIds = articles.map(article => article.pageid)
@@ -247,6 +249,7 @@ function  addDescriptions(articles) {
     xhr.onload = function() {
         if (xhr.status != 200) {
             console.error(`${xhr.status}: ${xhr.statusText}`);
+            removeLoadingIcon()
             return;
         }
         const response = JSON.parse(xhr.response)
@@ -260,13 +263,26 @@ function  addDescriptions(articles) {
         })
         console.log('articles with descriptions', articlesWithDescriptions)
         updateArticles(articlesWithDescriptions)
+        removeLoadingIcon()
         return
     };
     
     
     xhr.onerror = function() {
       console.log('network error')
+      removeLoadingIcon()
     };
+}
+
+function addLoadingIcon() {
+    const loading = document.createElement('img')
+    loading.src = 'loading.gif'
+    loading.id = 'loading-gif'
+    document.getElementById('search-results').append(loading)
+}
+
+function removeLoadingIcon() {
+    document.getElementById('loading-gif').remove()
 }
 
 findArticles('javascript')
