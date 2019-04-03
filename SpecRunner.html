@@ -1,14 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <title>Testing with Jasmine</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/jasmine.min.css">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Testing with Jasmine</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/jasmine.min.css">
+        <link rel="stylesheet" href="styles.css">
+        <!-- fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,400i,700|Source+Sans+Pro:400,700" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+        <!-- end fonts -->
+    </head>
+    <body>
+        <header class="header">
+            <h5 id='header__title'>Wikipedia Search Application</h5>
+        </header>
+        <main>
+            <h1>Wikipedia Search</h1>
+            <p class='error-text'></p>
+            <form id="search-form" class="search-form">
+                <input type="text" id='search-input' class="search-form__input" value="JavaScript"/>
+                <button class="btn btn-search" type="submit"><i class="fas fa-search"></i></button>
+            </form>
+            <div class='checkbox-container'>
+                <input id='exact-match-checkbox' type='checkbox' /><span> Exact Match</span>
+            </div>
+            <form class="search-options">
+                <div class='search-options__group'>
+                    <label class='search-options__label' for="sort-by">Sort by:</label>
+                    <select class='search-options__select' id="sort-by" value="default">
+                        <option value="default">Relevance and Popularity</option>
+                        <option value="alpha">Alphabetical (A-Z)</option>
+                        <option value="reverse-alpha">Reverse Alphabetical (Z-A)</option>
+                        <option value="recent">Last Revision (Most Recent First)</option>
+                        <option value="reverse-recent">Last Revision (Most Recent Last)</option>
+                    </select>
+                </div>
+                <div class='search-options__group'>
+                    <label class='search-options__label' for="filter-length">Article Length</label>
+                    <select class='search-options__select' id="filter-length" value="any">
+                        <option value="any">Any</option>
+                        <option value="short">Short (0 - 1999 words)</option>
+                        <option value="medium">Medium (2000-5999 words)</option>
+                        <option value="long">Long (6000+ words)</option>
+                    </select>
+                </div>
+                <div class='search-options__group'>
+                    <label class='search-options__label' for="filter-date">Last Revision Date</label>
+                    <select class='search-options__select' id="filter-date" value="any">
+                        <option value="any">Any</option>
+                        <option value="week">Past Week</option>
+                        <option value="month">Past Month</option>
+                        <option value="year">Past Year</option>
+                    </select>
+                </div>
+            </form>
+            <div id="search-results">
+
+            </div>
+        </main>
+        <footer>
+
+        </footer>
+    </body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/jasmine.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/jasmine-html.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jasmine/2.8.0/boot.min.js"></script>
     <script src="index.js"></script>
     <script src="spec.js"></script>
-</head>
-<body>
-</body>
 </html>
