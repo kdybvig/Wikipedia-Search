@@ -180,12 +180,21 @@ function sortArticles(articles) {
             console.error(`${sortBy} is not a sort by option.`);
     }
 
+
     const sortedArticles = articles.sort((article, nextArticle) => {
         const { sortByProperty, reverse } = sortOptions;
+        
+        const firstBigger = (
+            sortByProperty === 'title' ?
+                //change titles to uppercase before comparing
+                article[sortByProperty].toUpperCase() > nextArticle[sortByProperty].toUpperCase() : 
+                article[sortByProperty] > nextArticle[sortByProperty]
+        )
+
         let comparison = 0; //if values are equal the current order will be maintained
-        if(article[sortByProperty] > nextArticle[sortByProperty]){
+        if(firstBigger){
             comparison = 1; //value 1 is larger, value 2 will be sorted first
-        }  else if (article[sortByProperty] < nextArticle[sortByProperty]) {
+        }  else if (firstBigger) {
             comparison = -1; //value 2 is larger, value 1 will be sorted first
         }
 
