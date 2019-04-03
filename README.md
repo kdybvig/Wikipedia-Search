@@ -25,7 +25,7 @@ The Wikipedia Search Application allows users to search for Wikipedia articles o
 
 ## Tests
 
-This project includes five tests written in Jasmine in the spec.js file.  To run the tests open the SpecRunner.html file.
+This project includes five tests written in Jasmine in the spec.js file.  To run the tests open the [SpecRunner.html](https://kdybvig.github.io/Wikipedia-Search/SpecRunner.html) file.
 
 ## Credits
 Application coded by Keith Murgic  
