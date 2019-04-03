@@ -143,8 +143,8 @@ function highlightSearchTerms(searchTerm, text) {
         text = text.replace(regex, (match) => ` <span class='highlighted'>${match}</span> `);
 
         if(term === 'and') {
-            const andRegex = new RegExp (' & ', 'g')
-            text = text.replace(andRegex, ` <span class='highlighted'>${'&'}</span> `);
+            const andRegex = new RegExp ('&', 'g')
+            text = text.replace(andRegex, `<span class='highlighted'>${'&'}</span>`);
         } //highlight & symbols for queries with the word 'and' or symbol '&', e.g. "Ben & Jerry's"
     })
     return text;
