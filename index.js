@@ -234,7 +234,7 @@ function filterByDate(articles) {
         }
         function oneYearAgo() {
             const date = new Date();
-            date.setYear(date.getYear() - 1);
+            date.setDate(date.getDate() - 365);
             return date.getTime();          
         }
         if(filter === 'any') return true
