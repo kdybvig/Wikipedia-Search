@@ -26,9 +26,36 @@ h1 {
     font-size: 72px;
 }
 
-#search-form {
+.error-text {
+    height: 22px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    color: red;
+    font-family: sans-serif;
+}
+
+.search-form {
     text-align: center;
     margin-bottom: 30px;
+}
+
+.search-form__input {
+    padding: 6px;
+    font-size: 18px;
+    margin-right: -2px;
+}
+
+.btn-search {
+    padding: 6px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-left: 0px;
+}
+
+.checkbox-container {
+    text-align: center;
+    font-weight: bold;
 }
 
 .search-options {
@@ -39,6 +66,16 @@ h1 {
 .search-options__group {
     display: inline;
     margin-right: 20px;
+}
+
+.search-options__label {
+    font-weight: bold;
+}
+
+.search-options__select {
+    font-size: 16px;
+    padding: 4px;
+    font-weight: bold;
 }
 
 #loading-gif {
@@ -70,16 +107,22 @@ h1 {
     font-style: italic;
 }
 
+@media only screen and (max-width: 1280px) {
+    .search-options__group {
+        display: block;
+        margin-bottom: 10px;
+        margin-right: 0px;
+      }
+  
+      .search-options {
+          margin: 30px 80px 50px 80px;
+      }
+}
+
 
 @media only screen and (max-width: 1020px) {
     h1 {
         font-size: 60px;
-    }
-
-    .search-options__group {
-      display: block;
-      margin-bottom: 10px;
-      margin-right: 0px;
     }
 
     .search-options {
@@ -104,7 +147,6 @@ h1 {
 
     .search-options {
         margin: 30px 40px 50px 40px;
-        text-align: left;
     }
 }
 
@@ -119,7 +161,6 @@ h1 {
 
     .search-options {
         margin: 30px 20px 50px 20px;
-        text-align: left;
     }
 }
 
