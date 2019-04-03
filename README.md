@@ -19,8 +19,8 @@ The Wikipedia Search Application allows users to search for Wikipedia articles o
 * Search results can be sorted by relevance, alphabetical order, reverse alphabetical order, most recently edited, or least recently edited.
 * Search results can be filtered by date modified (past week, past month, or past year) as well as by the word count of the article.
 * Application uses the MediaWiki nearmatch feature to allow users to search for only nearly exact matches to their queries.
-* The application scans for words matching any of the search terms in the extracts of search results and highlights the matching terms in yellow.
-* The application leverages multiple API endpoints in order to access title, wordcount and revision date data as well as an extract from each article and the url for each article.
+* The application scans the extracts of each article for words matching any of the search terms in the user's query and highlights the matching terms in yellow.
+* The application leverages multiple API endpoints in order to access title, wordcount, and revision date data as well as an extract from each article and the url for each article.
 * CSS classnames utilize the BEM naming convention.
 
 ## Tests
